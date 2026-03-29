@@ -1,37 +1,66 @@
+from pathlib import Path
+
 import pandas as pd
 import requests
 
-MODEL = "llama3"
-INPUT_FILE = "cti-mcq.tsv"
-OUTPUT_FILE = "outputs/cti-mcq-results.csv"
+NAME = "name"
+MODEL = "llama3:8b"
+# MODEL = "llama3:70b"
 
-df = pd.read_csv(INPUT_FILE, sep="\t")
-results = []
+MODEL_SAFE = MODEL.replace(":", "_")
 
-print(f"Model: {MODEL}\tInput: {INPUT_FILE}\tStarting...")
+OUTPUT_DIR = Path(f"outputs_{NAME}_{MODEL_SAFE}")
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-for idx, row in df.iterrows():
-    prompt = row["Prompt"]
+INPUT_FILES = [
+    "cti-mcq.tsv",
+    "cti-rcm.tsv",
+    "cti-rcm-2021.tsv",
+    "cti-vsp.tsv",
+    "cti-ate.tsv",
+]
 
-    print(f"{idx}\tPrompt: {prompt}\n")
+OLLAMA_URL = "http://localhost:11434/api/generate"
 
-    response = requests.post(
-        "http://localhost:11434/api/generate",
-        json={
-            "model": MODEL,
-            "prompt": prompt,
-            "stream": False
-        },
-        timeout=300
-    )
-    response.raise_for_status()
-    answer = response.json()["response"]
+for input_file in INPUT_FILES:
+    input_path = Path(input_file)
+    output_file = OUTPUT_DIR / f"{input_path.stem}-res.csv"
 
-    results.append({
-        "Prompt": prompt,
-        "GT": row.get("GT", ""),
-        "Prediction": answer
-    })
+    df = pd.read_csv(input_path, sep="\t")
+    results = []
 
-pd.DataFrame(results).to_csv(OUTPUT_FILE, index=False)
-print("Hotovo.")
+    print(f"Model: {MODEL} | Input: {input_file} | Starting...")
+
+    for idx, row in df.iterrows():
+        prompt = str(row["Prompt"])
+
+        print(f"[{input_file}] i={idx}")
+
+        try:
+            response = requests.post(
+                OLLAMA_URL,
+                json={
+                    "model": MODEL,
+                    "prompt": prompt,
+                    "stream": False
+                },
+                timeout=300
+            )
+            response.raise_for_status()
+            answer = response.json().get("response", "").strip()
+
+        except requests.RequestException as e:
+            answer = f"ERROR: {e}"
+            print(f"Request failed on row {idx}: {e}")
+
+        results.append({
+            "Index": idx,
+            "Prompt": prompt,
+            "GT": row.get("GT", ""),
+            "Prediction": answer
+        })
+
+    pd.DataFrame(results).to_csv(output_file, index=False, encoding="utf-8")
+    print(f"Done. Input: {input_file} | Output: {output_file}")
+
+print("All done.")
