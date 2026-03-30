@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import requests
 
-NAME = "name"
+NAME = "kusmara"
 MODEL = "llama3:8b"
 # MODEL = "llama3:70b"
 
@@ -11,11 +11,11 @@ MODEL_SAFE = MODEL.replace(":", "_")
 
 OUTPUT_DIR = Path(f"outputs_{NAME}_{MODEL_SAFE}")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
+ # "cti-mcq.tsv",
+    # "cti-rcm.tsv",
+    # "cti-rcm-2021.tsv",
+    
 INPUT_FILES = [
-    "cti-mcq.tsv",
-    "cti-rcm.tsv",
-    "cti-rcm-2021.tsv",
     "cti-vsp.tsv",
     "cti-ate.tsv",
 ]
@@ -27,12 +27,15 @@ for input_file in INPUT_FILES:
     output_file = OUTPUT_DIR / f"{input_path.stem}-res.csv"
 
     df = pd.read_csv(input_path, sep="\t")
-    results = []
 
     print(f"Model: {MODEL} | Input: {input_file} | Starting...")
 
-    for idx, row in df.iterrows():
-        prompt = str(row["Prompt"])
+    first_write = True
+
+    for row in df.itertuples():
+        idx = row.Index
+        prompt = str(row.Prompt)
+        gt = getattr(row, "GT", "")
 
         print(f"[{input_file}] i={idx}")
 
@@ -53,14 +56,23 @@ for input_file in INPUT_FILES:
             answer = f"ERROR: {e}"
             print(f"Request failed on row {idx}: {e}")
 
-        results.append({
+        row_df = pd.DataFrame([{
             "Index": idx,
             "Prompt": prompt,
-            "GT": row.get("GT", ""),
+            "GT": gt,
             "Prediction": answer
-        })
+        }])
 
-    pd.DataFrame(results).to_csv(output_file, index=False, encoding="utf-8")
+        row_df.to_csv(
+            output_file,
+            mode="w" if first_write else "a",
+            header=first_write,
+            index=False,
+            encoding="utf-8"
+        )
+
+        first_write = False
+
     print(f"Done. Input: {input_file} | Output: {output_file}")
 
 print("All done.")
