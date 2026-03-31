@@ -11,13 +11,14 @@ MODEL_SAFE = MODEL.replace(":", "_")
 
 OUTPUT_DIR = Path(f"outputs_{NAME}_{MODEL_SAFE}")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
- # "cti-mcq.tsv",
-    # "cti-rcm.tsv",
-    # "cti-rcm-2021.tsv",
+ 
     
 INPUT_FILES = [
     "cti-vsp.tsv",
     "cti-ate.tsv",
+    # "cti-mcq.tsv",
+    # "cti-rcm.tsv",
+    # "cti-rcm-2021.tsv",
 ]
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
