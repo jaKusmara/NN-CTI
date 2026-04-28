@@ -16,9 +16,9 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 INPUT_FILES = [
     "cti-vsp.tsv",
     "cti-ate.tsv",
-    # "cti-mcq.tsv",
-    # "cti-rcm.tsv",
-    # "cti-rcm-2021.tsv",
+    "cti-mcq.tsv",
+    "cti-rcm.tsv",
+    "cti-rcm-2021.tsv",
 ]
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
