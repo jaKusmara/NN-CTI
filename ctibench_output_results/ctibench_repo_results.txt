@@ -1,0 +1,38 @@
+==================================================
+ CTI BENCHMARK EVALUATION RESULTS
+==================================================
+
+Evaluating Model: ChatGPT-3.5
+------------------------------
+  [MCQ] Accuracy:       54.12%
+  [RCM] Accuracy:       67.20%
+  [RCM 2021] Accuracy:  62.70%
+  [VSP] Mean Abs Dev:   1.5743 (Lower is better)
+
+Evaluating Model: ChatGPT-4
+------------------------------
+  [MCQ] Accuracy:       71.00%
+  [RCM] Accuracy:       72.00%
+  [RCM 2021] Accuracy:  68.00%
+  [VSP] Mean Abs Dev:   1.3100 (Lower is better)
+
+Evaluating Model: Gemini-1.5
+------------------------------
+  [MCQ] Accuracy:       65.44%
+  [RCM] Accuracy:       66.63%
+  [RCM 2021] Accuracy:  65.03%
+  [VSP] Mean Abs Dev:   1.0911 (Lower is better)
+
+Evaluating Model: LLAMA3-70B
+------------------------------
+  [MCQ] Accuracy:       65.76%
+  [RCM] Accuracy:       65.90%
+  [RCM 2021] Accuracy:  60.76%
+  [VSP] Mean Abs Dev:   1.8292 (Lower is better)
+
+Evaluating Model: LLAMA3-8B
+------------------------------
+  [MCQ] Accuracy:       61.32%
+  [RCM] Accuracy:       44.70%
+  [RCM 2021] Accuracy:  48.30%
+  [VSP] Mean Abs Dev:   1.9076 (Lower is better)
